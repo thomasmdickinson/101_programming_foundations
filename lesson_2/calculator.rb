@@ -38,9 +38,7 @@ end
 
 prompt("Hi #{name}!")
 
-loop do #main loop
-
-
+loop do # main loop
   loop do
     prompt("What's the first number?")
     number1 = Kernel.gets().chomp()
@@ -60,8 +58,6 @@ loop do #main loop
       prompt("Hmm... that doesn't look like a valid number.")
     end
   end
-
-
 
   operator_prompt = <<-MSG
     What operation would you like to perform?
@@ -87,14 +83,14 @@ loop do #main loop
 
   result = case operator
            when '1'
-             result = number1.to_i() + number2.to_i()
+             number1.to_i() + number2.to_i()
            when '2'
-             result = number1.to_i() - number2.to_i()
+             number1.to_i() - number2.to_i()
            when '3'
-             result = number1.to_i() * number2.to_i()
+             number1.to_i() * number2.to_i()
            when '4'
-             result = number1.to_f() / number2.to_f()
-  end
+             number1.to_f() / number2.to_f()
+           end
 
   prompt("The result is #{result}")
 
@@ -102,7 +98,6 @@ loop do #main loop
   answer = Kernel.gets().chomp()
 
   break unless answer.downcase().start_with?('y')
-
 end
 
-prompt ("Thank you for using the Calculator. Farewell!")
+prompt("Thank you for using the Calculator. Farewell!")
