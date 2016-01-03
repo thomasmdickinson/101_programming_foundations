@@ -1,61 +1,95 @@
+require 'yaml'
+require 'pry'
+
+# Bonus feature 4 - moves messages to configuration file
+# Bonus feature 5 - adds spanish and french
+MESSAGES = YAML.load_file('calculator_messages.yml')
+
 def prompt(message)
   Kernel.puts("=> #{message}")
 end
 
 def valid_number?(num)
-  num.to_i != 0
+  # Bonus Feature 1 - validates correctly for 0
+  # Bonus Feature 2 - validates correctly for floats
+  num == '0' || num.to_i != 0 || num.to_f.to_s == num
 end
 
 def operation_to_message(op)
-  case op
-  when '1'
-    'Adding'
-  when '2'
-    'Subtracting'
-  when '3'
-    'Multiplying'
-  when '4'
-    'Dividing'
-  end
+  # Bonus feature 3 - allows for code to be added to the method
+  message = case op
+            when '1'
+              'Adding'
+            when '2'
+              'Subtracting'
+            when '3'
+              'Multiplying'
+            when '4'
+              'Dividing'
+            end
+  message
 end
-
-prompt("Welcome to Calculator! Please enter your name.")
 
 name = ''
 operator = ''
 number1 = ''
 number2 = ''
+lang = 'en'
+
+prompt(MESSAGES[lang]['welcome'])
 
 loop do
   name = Kernel.gets().chomp()
 
   if name.empty?()
-    prompt("Make sure to use a valid name.")
+    prompt(MESSAGES[lang]['valid_name'])
   else
     break
   end
 end
 
+lang_prompt = <<-LNG
+  Enter EN for English.
+  Introducir ES para español.
+  Entrez SP pour les français.
+LNG
+
+prompt(lang_prompt)
+
+# Bonus feature 5 - adds spanish and french
+loop do
+
+  lang = Kernel.gets().chomp()
+
+  if ['en', 'fr', 'es'].include?(lang.downcase)
+    break
+  end
+
+  prompt(MESSAGES[lang]['valid_lang'])
+end
+
+# binding.pry
+
 prompt("Hi #{name}!")
 
 loop do # main loop
   loop do
-    prompt("What's the first number?")
+    prompt(MESSAGES[lang]['first_num_ask'])
     number1 = Kernel.gets().chomp()
     if valid_number?(number1)
       break
     else
-      prompt("Hmm... that doesn't look like a valid number.")
+      prompt(MESSAGES[lang]['valid_number'])
     end
   end
 
   loop do
-    prompt("What's the second number?")
+    prompt(MESSAGES[lang]['second_num_ask'])
     number2 = Kernel.gets().chomp()
     if valid_number?(number2)
       break
     else
-      prompt("Hmm... that doesn't look like a valid number.")
+      prompt(MESSAGES[lang]['valid_number'])
     end
   end
 
@@ -74,12 +108,12 @@ loop do # main loop
     if %w(1 2 3 4).include?(operator)
       break
     else
-      prompt("You must choose 1, 2, 3, or 4.")
+      prompt(MESSAGES[lang]['valid_op'])
     end
   end
 
   prompt("#{operation_to_message(operator)} the two numbers...")
-  sleep(2)
+  sleep(1)
 
   result = case operator
            when '1'
@@ -94,10 +128,10 @@ loop do # main loop
 
   prompt("The result is #{result}")
 
-  prompt("Do you want to perform another calculation? (Y to calculate again)")
+  prompt(MESSAGES[lang]['ask_again'])
   answer = Kernel.gets().chomp()
 
   break unless answer.downcase().start_with?('y')
 end
 
-prompt("Thank you for using the Calculator. Farewell!")
+prompt(MESSAGES[lang]['thanks_bye'])
