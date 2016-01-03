@@ -6,11 +6,11 @@ end
 
 # Bonus Feature 1 - allows for lizard and spock
 def win?(first, second)
-  (first == 'rock' && (second == 'scissors' || second == 'lizard')) ||
-    (first == 'paper' && (second == 'rock' || second == 'spock')) ||
-    (first == 'scissors' && (second == 'paper' || second == 'lizard')) ||
-    (first == 'lizard' && (second == 'paper' || second == 'spock')) ||
-    (first == 'spock' && (second == 'scissors' || second == 'rock'))
+  (first == 'rock' && %w(scissors lizard).include?second    ||
+    (first == 'paper' && %w(rock spock).include?second      ||
+    (first == 'scissors' && %w(paper lizard).include?second ||
+    (first == 'lizard' && %w(paper spock).include?second    ||
+    (first == 'spock' && %w(scissors rock).include?second
 end
 
 def display_result(player, computer)
@@ -30,17 +30,18 @@ end
 
 # Bonus Feature 2 - allows for partial input
 def translate_input(input)
-  if input.start_with?('r')
+  case
+  when input.start_with?('r')
     'rock'
-  elsif input.start_with?('p')
+  when input.start_with?('p')
     'paper'
-  elsif input.start_with?('l')
+  when input.start_with?('l')
     'lizard'
-  elsif input.start_with?('sc')
+  when input.start_with?('sc')
     'scissors'
-  elsif input.start_with?('sp')
+  when input.start_with?('sp')
     'spock'
-  elsif input.start_with?('s')
+  when input.start_with?('s')
     's'
   else
     'invalid choice'
@@ -58,12 +59,8 @@ prompt("Please tell me your name.")
 
 loop do
   player_name = Kernel.gets().chomp()
-
-  if player_name.empty?()
+  break unless player_name.empty?()
     prompt("No, really, please tell me your name.")
-  else
-    break
-  end
 end
 
 prompt("Well hello, there, #{player_name}. Let's begin.")
