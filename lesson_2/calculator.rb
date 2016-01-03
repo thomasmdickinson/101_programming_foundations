@@ -15,8 +15,8 @@ def valid_number?(num)
   num == '0' || num.to_i != 0 || num.to_f.to_s == num
 end
 
+# Bonus feature 3 - allows for code to be added to the method
 def operation_to_message(op)
-  # Bonus feature 3 - allows for code to be added to the method
   message = case op
             when '1'
               'Adding'
@@ -51,20 +51,16 @@ end
 lang_prompt = <<-LNG
   Enter EN for English.
   Introducir ES para español.
-  Entrez SP pour les français.
+  Entrez FR pour les français.
 LNG
 
 prompt(lang_prompt)
 
 # Bonus feature 5 - adds spanish and french
 loop do
-
   lang = Kernel.gets().chomp()
-
-  if ['en', 'fr', 'es'].include?(lang.downcase)
-    break
-  end
-
+  break if %w(en fr es).include?(lang.downcase)
+  # binding.pry
   prompt(MESSAGES[lang]['valid_lang'])
 end
 
