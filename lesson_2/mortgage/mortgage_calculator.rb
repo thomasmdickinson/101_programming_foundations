@@ -1,5 +1,4 @@
 require 'yaml'
-require 'pry'
 
 MESSAGES = YAML.load_file('mortgage_messages.yml')
 
@@ -29,7 +28,7 @@ loop do # Main loop
   prompt(MESSAGES['get_apr'])
   loan_apr = Kernel.gets().chomp().to_f
   loop do
-    break if loan_apr > 0 && loan_apr < 1
+    break if loan_apr.between?(0,1)
     prompt(MESSAGES['bad_apr'])
     loan_apr = Kernel.gets().chomp().to_f
   end
@@ -47,12 +46,10 @@ loop do # Main loop
 
   # Just a bit of suspense, for fun
   prompt(MESSAGES['calc'])
-  sleep(1)
+
+3.times do |idx|
   prompt(MESSAGES['suspense'])
-  sleep(1)
-  prompt(MESSAGES['suspense'])
-  sleep(1)
-  prompt(MESSAGES['suspense'])
+  sleep(1) if idx < 2
 
   # Calculates the fixed payment
   monthly_payment = loan_amt * monthly_interest *

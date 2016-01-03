@@ -1,5 +1,4 @@
 require 'yaml'
-require 'pry'
 
 # Bonus feature 4 - moves messages to configuration file
 # Bonus feature 5 - adds spanish and french
