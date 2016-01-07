@@ -1,25 +1,21 @@
-require_relative 'ttt_methods.rb'
+require_relative 'ttt_display_methods'
+require_relative 'ttt_state_logic_methods'
 require 'yaml'
-require 'pry'
 
 MESSAGES = YAML.load_file('ttt_messages.yml')
 
 # Set up the game
-board = [
-  [nil, nil, nil],
-  [nil, nil, nil],
-  [nil, nil, nil]
-]
-
-player_side = :x
-computer_side = :o
-player_name = ''
-
 cells = {
-  'a1' => [0, 0], 'a2' => [1, 0], 'a3' => [2, 0],
-  'b1' => [0, 1], 'b2' => [1, 1], 'b3' => [2, 1],
-  'c1' => [0, 2], 'c2' => [1, 2], 'c3' => [2, 2]
+  'a1' => 0, 'b1' => 1, 'c1' => 2,
+  'a2' => 3, 'b2' => 4, 'c2' => 5,
+  'a3' => 6, 'b3' => 7, 'c3' => 8
 }
+
+winning_lines = [
+  [0, 1, 2], [3, 4, 5], [6, 7, 8],
+  [0, 3, 6], [1, 4, 7], [2, 5, 9],
+  [0, 4, 9], [2, 4, 6]
+]
 
 # Welcome the Player
 puts MESSAGES['welcome']
@@ -27,23 +23,23 @@ sleep 1
 
 # Get their name
 puts MESSAGES['name_ask']
+player_name = ''
 loop do
   player_name = gets.chomp.to_s
   break unless player_name == ''
   puts MESSAGES['bad_name']
 end
-
 puts "Okay, #{player_name}, let's get started!"
 sleep 1
 
 loop do # Main loop
   # Do they want to be X (go first) or O (go second)
+  player_side = :x
+  computer_side = :o
   loop do
     puts MESSAGES['pick_side']
     player_xo_choice = gets.chomp.downcase
     if player_xo_choice.start_with?('x')
-      player_side = :x
-      computer_side = :o
       puts MESSAGES['player_pick_x']
       break
     elsif player_xo_choice.start_with?('o')
@@ -60,11 +56,7 @@ loop do # Main loop
   # Show them the board
   puts MESSAGES['set_board']
   sleep 1
-  board = [
-    [nil, nil, nil],
-    [nil, nil, nil],
-    [nil, nil, nil]
-  ]
+  board = initialize_board
   display_board(board)
   sleep 1
   puts MESSAGES['explain_cell_ref']
@@ -78,8 +70,7 @@ loop do # Main loop
 
       # Ask for input
       player_input = ''
-      player_row = 0
-      player_col = 0
+      player_cell = 0
       loop do
         puts MESSAGES['pick_cell']
         player_input = gets.chomp.downcase
@@ -90,8 +81,7 @@ loop do # Main loop
           puts MESSAGES['taken_cell']
           sleep 1
         else
-          player_row = cells[player_input][0]
-          player_col = cells[player_input][1]
+          player_cell = cells[player_input]
           break
         end
       end
@@ -99,12 +89,12 @@ loop do # Main loop
       # Mark the board and show it to the player
       puts MESSAGES['adding_pick']
       sleep 1
-      board[player_row][player_col] = player_side
+      board[player_cell] = player_side
       display_board(board)
       sleep 1
 
       # Break the turn loop if the game is over
-      break if game_over?(board)
+      break if game_over?(board, winning_lines)
     end
 
     # Computer's Turn
@@ -122,21 +112,20 @@ loop do # Main loop
 
     # Mark the board and show it to the player
     puts "Okay, I pick #{computer_choice}."
-    computer_row = cells[computer_choice][0]
-    computer_col = cells[computer_choice][1]
-    board[computer_row][computer_col] = computer_side
+    computer_cell = cells[computer_choice]
+    board[computer_cell] = computer_side
     sleep 1
     display_board(board)
     sleep 1
 
     # Break the turn loop if the game is over
-    break if game_over?(board)
+    break if game_over?(board, winning_lines)
   end
 
   # Announce results
-  if check_for_winner(board) == player_side
+  if who_won?(board, winning_lines) == player_side
     puts "#{player_name} wins!"
-  elsif check_for_winner(board) == computer_side
+  elsif who_won?(board, winning_lines) == computer_side
     puts 'I won!'
   else
     puts "It's a tie!"
