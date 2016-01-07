@@ -1,0 +1,23 @@
+Logic
+
+- Set up the game
+	- Welcome the Player
+	- Get their name
+- Main loop
+	- Do they want to be X (go first) or O (go second)
+	- Show them the board
+	- Turn Loop
+		- Player's Turn
+			- If the board is blank and the player is O
+				- Skip the turn
+			- Otherwise
+				- Ask for input
+				- Mark the board and show it to the player
+				- Break the turn loop if the game is over
+		- Computer's Turn
+			- Determine which one to mark
+			- Mark the board and show it to the player
+			- Break the turn loop if the game is over
+	- Play again?
+		- Break the main loop if no
+- Goodbye
