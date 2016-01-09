@@ -15,14 +15,11 @@ end
 # Board State Checks
 
 def board_full?(state)
-  state.each do |cell|
-    return false if cell.nil?
-  end
+  state.none?(&:nil?)
 end
 
 def board_empty?(state)
-  state.each { |cell| return false unless cell.nil? }
-  true
+  state.all?(&:nil?)
 end
 
 def cell_empty?(state, cell)

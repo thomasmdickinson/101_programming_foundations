@@ -2,6 +2,7 @@ require_relative 'ttt_display_methods'
 require_relative 'ttt_state_logic_methods'
 require_relative 'ttt_computer_strategy_methods'
 require 'yaml'
+require 'pry'
 
 MESSAGES = YAML.load_file('ttt_messages.yml')
 
@@ -91,7 +92,7 @@ loop do # Main loop
         if !cells.key?(player_input)
           puts MESSAGES['bad_cell']
           sleep 1
-        elsif !cell_empty?(board, cells, rowcol_to_idx(player_input, cells))
+        elsif !cell_empty?(board, rowcol_to_idx(player_input, cells))
           puts MESSAGES['taken_cell']
           sleep 1
         else
@@ -120,35 +121,27 @@ loop do # Main loop
     sleep 1
     computer_cell = nil
 
-    if difficuly == 1
-      simple version is commented out
-      loop do
-        computer_cell = (0..8).to_a.sample
-        break if cell_empty?(board, cells, computer_cell)
-      end
+    if difficulty == 1
+      # On this difficulty level, just pick a random empty cell.
+      pick_random_available_cell(board)
     elsif difficulty == 2
       if board_empty?(board)
-        computer_cell = 0
-      elsif can_win?(board, winning_lines, computer_side)
-        line = near_wins_on_board(board, winning_lines, computer_side).sample
-        line.each { |cell| computer_cell = cell if board[cell].nil? }
-      elsif can_win?(board, winning_lines, player_side)
-        line = near_wins_on_board(board, winning_lines, player_side).sample
-        line.each { |cell| computer_cell = cell if board[cell].nil? }
-      elsif fork_possible?(board, winning_lines, computer_side)
+        # If the board is empty, play random corner.
+        computer_cell = pick_a_corner(board, player_side)
+      elsif win_possible?(board, winning_lines, computer_side, player_side)
+        # Complete a line, to win or to block player win.
         computer_cell =
-        possible_forks(board, winning_lines, computer_side).sample
-      elsif fork_possible?(board, winning_lines, player_side)
-        computer_cell = possible_forks(board, winning_lines, player_side).sample
-      elsif cell_empty?(board, cells, 4)
+          complete_a_line(board, winning_lines, computer_side, player_side)
+      elsif fork_possible?(board, winning_lines, computer_side, player_side)
+        # Create a fork or block player fork.
+        computer_cell =
+          play_fork(board, winning_lines, computer_side, player_side)
+      elsif cell_empty?(board, 4)
         computer_cell = 4
       elsif empty_corners(board).size > 0
         computer_cell = pick_a_corner(board, player_side)
       else
-        loop do
-          computer_cell = (0..8).to_a.sample
-          break if cell_empty?(board, cells, computer_cell)
-        end
+        pick_random_available_cell(board)
       end
     end
 
