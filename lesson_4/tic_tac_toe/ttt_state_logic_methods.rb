@@ -4,6 +4,14 @@ def initialize_board
   board
 end
 
+def idx_to_rowcol(int, ref_table)
+  ref_table.key(int)
+end
+
+def rowcol_to_idx(ref, ref_table)
+  ref_table[ref]
+end
+
 # Board State Checks
 
 def board_full?(state)
@@ -14,10 +22,11 @@ end
 
 def board_empty?(state)
   state.each { |cell| return false unless cell.nil? }
+  true
 end
 
-def cell_empty?(state, list_of_cells, cell_ref)
-  state[list_of_cells[cell_ref]].nil?
+def cell_empty?(state, cell)
+  state[cell].nil?
 end
 
 # Game State Checks

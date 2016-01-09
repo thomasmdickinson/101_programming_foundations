@@ -1,6 +1,8 @@
 welcome: "Welcome to Tic Tac Toe!"
 name_ask: "Please enter your name."
 bad_name: "Come on, if you don't wanna tell me, just make one up."
+difficulty_ask: "Please enter 1 for easy mode or 2 for hard mode."
+bad_difficulty: "I don't have a mode like that!"
 pick_side: "Would you like to be X or O? X goes first!"
 player_pick_x: "Okay, you'll be X and I'll be O."
 player_pick_o: "Okay, I'll be X and you'll be O."

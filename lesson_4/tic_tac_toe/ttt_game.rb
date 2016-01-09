@@ -1,5 +1,6 @@
 require_relative 'ttt_display_methods'
 require_relative 'ttt_state_logic_methods'
+require_relative 'ttt_computer_strategy_methods'
 require 'yaml'
 
 MESSAGES = YAML.load_file('ttt_messages.yml')
@@ -13,9 +14,12 @@ cells = {
 
 winning_lines = [
   [0, 1, 2], [3, 4, 5], [6, 7, 8],
-  [0, 3, 6], [1, 4, 7], [2, 5, 9],
-  [0, 4, 9], [2, 4, 6]
+  [0, 3, 6], [1, 4, 7], [2, 5, 8],
+  [0, 4, 8], [2, 4, 6]
 ]
+
+player_score = 0
+computer_score = 0
 
 # Welcome the Player
 puts MESSAGES['welcome']
@@ -29,6 +33,16 @@ loop do
   break unless player_name == ''
   puts MESSAGES['bad_name']
 end
+
+# Set the difficulty level
+puts MESSAGES['difficulty_ask']
+difficulty = 1
+loop do
+  difficulty = gets.chomp.to_i
+  break if [1, 2].include?(difficulty)
+  puts MESSAGES['bad_difficulty']
+end
+
 puts "Okay, #{player_name}, let's get started!"
 sleep 1
 
@@ -77,11 +91,11 @@ loop do # Main loop
         if !cells.key?(player_input)
           puts MESSAGES['bad_cell']
           sleep 1
-        elsif !cell_empty?(board, cells, player_input)
+        elsif !cell_empty?(board, cells, rowcol_to_idx(player_input, cells))
           puts MESSAGES['taken_cell']
           sleep 1
         else
-          player_cell = cells[player_input]
+          player_cell = rowcol_to_idx(player_input, cells)
           break
         end
       end
@@ -104,15 +118,42 @@ loop do # Main loop
     # Determine which one to mark
     puts MESSAGES['thinking']
     sleep 1
-    computer_choice = ''
-    loop do
-      computer_choice = cells.keys.sample
-      break if cell_empty?(board, cells, computer_choice)
+    computer_cell = nil
+
+    if difficuly == 1
+      simple version is commented out
+      loop do
+        computer_cell = (0..8).to_a.sample
+        break if cell_empty?(board, cells, computer_cell)
+      end
+    elsif difficulty == 2
+      if board_empty?(board)
+        computer_cell = 0
+      elsif can_win?(board, winning_lines, computer_side)
+        line = near_wins_on_board(board, winning_lines, computer_side).sample
+        line.each { |cell| computer_cell = cell if board[cell].nil? }
+      elsif can_win?(board, winning_lines, player_side)
+        line = near_wins_on_board(board, winning_lines, player_side).sample
+        line.each { |cell| computer_cell = cell if board[cell].nil? }
+      elsif fork_possible?(board, winning_lines, computer_side)
+        computer_cell =
+        possible_forks(board, winning_lines, computer_side).sample
+      elsif fork_possible?(board, winning_lines, player_side)
+        computer_cell = possible_forks(board, winning_lines, player_side).sample
+      elsif cell_empty?(board, cells, 4)
+        computer_cell = 4
+      elsif empty_corners(board).size > 0
+        computer_cell = pick_a_corner(board, player_side)
+      else
+        loop do
+          computer_cell = (0..8).to_a.sample
+          break if cell_empty?(board, cells, computer_cell)
+        end
+      end
     end
 
     # Mark the board and show it to the player
-    puts "Okay, I pick #{computer_choice}."
-    computer_cell = cells[computer_choice]
+    puts "Okay, I pick #{idx_to_rowcol(computer_cell, cells)}."
     board[computer_cell] = computer_side
     sleep 1
     display_board(board)
@@ -124,13 +165,27 @@ loop do # Main loop
 
   # Announce results
   if who_won?(board, winning_lines) == player_side
+    player_score += 1
     puts "#{player_name} wins!"
   elsif who_won?(board, winning_lines) == computer_side
     puts 'I won!'
+    computer_score += 1
   else
     puts "It's a tie!"
   end
   sleep 1
+
+  # Announce standings.
+  puts "You've won #{player_score} games, and I've won #{computer_score}."
+  if player_score >= 5
+    puts "You're the big winner! I'm clearing the score."
+    player_score = 0
+    computer_score = 0
+  elsif computer_score >= 5
+    puts "I'm the big winner! I'm clearing the score."
+    player_score = 0
+    computer_score = 0
+  end
 
   # Play again?
   puts MESSAGES['again']
