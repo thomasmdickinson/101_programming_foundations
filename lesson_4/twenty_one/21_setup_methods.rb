@@ -38,6 +38,18 @@ def announce_score(hand, name)
   sleep 1
 end
 
+def announce_dealer_bust(hand, name)
+  prompt "Oh, botheration! I've gone and busted."
+  sleep 1
+  hand.each do |card|
+    if card[:secret] == true
+      prompt "I had a hidden #{card[:value]} of #{card[:suit]}."
+      sleep 1
+    end
+  end
+  prompt "So my score was #{hand_total(hand)}! Too high, I'm afraid."
+end
+
 ### COMPUTATIONS
 
 def card_points(value)
@@ -77,13 +89,14 @@ def dealer_stay?(hand)
 end
 
 def winner(hand1, name1, hand2, name2)
+  winner_name = ''
   if bust?(hand1)
     winner_name = name2
   elsif bust?(hand2)
     winner_name = name1
   elsif hand_total(hand1) > hand_total(hand2)
     winner_name = name1
-  else
+  elsif hand_total(hand1) < hand_total(hand2)
     winner_name = name2
   end
   winner_name

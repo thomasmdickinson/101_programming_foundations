@@ -82,11 +82,7 @@ loop do
       end
 
       if bust?(dealer_hand)
-        prompt "Oh, botheration! I've gone and busted."
-        sleep 1
-        dealer_hand.first[:secret] = false
-        announce_hand(dealer_hand, dealer_name)
-        announce_score(dealer_hand, dealer_name)
+        announce_dealer_bust(dealer_hand, dealer_name)
         break
       end
     end
@@ -106,7 +102,11 @@ loop do
 
   # Reveal winner
   game_winner = winner(player_hand, player_name, dealer_hand, dealer_name)
-  prompt "#{game_winner} is the winner!"
+  if game_winner = ''
+    prompt "It's a tie. Or as we call it in the business, a 'push!'"
+  else
+    prompt "#{game_winner} is the winner!"
+  end
   sleep 1
   prompt 'Play again?'
   again_answer = Kernel.gets.chomp
